@@ -33,3 +33,6 @@ extension Acronym: Migration {}
 
 // Conform Acronym to Content for converting data from Model to various formats using Content and Codable
 extension Acronym: Content {}
+
+// Conform Acronym to Parameter
+extension Acronym: Parameter {}
