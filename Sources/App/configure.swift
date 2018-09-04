@@ -46,7 +46,18 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     /// Configure migrations
     // Create a MigrationConfig type which tells the application which database to use for each model
     var migrations = MigrationConfig()
-    // As Acronym conforms to Migration, you can tell Fluent to create the table when the application starts.
+    // As Acronym and User conforms to Migration, you can tell Fluent to create the table for respective classes when the application starts.
+    // Because you’re linking the acronym’s userID property to the User table, you must create the User table first.
+    migrations.add(model: User.self, database: .psql)
     migrations.add(model: Acronym.self, database: .psql)
     services.register(migrations)
+    
+    // 1. Create a CommandConfig with the default configuration.
+    var commandConfig = CommandConfig.default()
+    
+    // 2. Add the Fluent commands to your CommandConfig. This adds both the revert command with the identifier revert and the migrate command with the identifier migrate
+    commandConfig.useFluentCommands()
+    
+    // 3. Register the commandConfig as a service.
+    services.register(commandConfig)
 }

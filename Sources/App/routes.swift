@@ -13,4 +13,9 @@ public func routes(_ router: Router) throws {
     let acronymsController = AcronymsController()
     // 2. Register the new type with the router to ensure the controller’s routes get registered.
     try router.register(collection: acronymsController)
+    
+    // 1. Create a new UsersController
+    let usersController = UsersController()
+    // 2. Register the new type with router to ensure the controller routes get registeres
+    try router.register(collection: usersController)
 }
