@@ -28,7 +28,7 @@ struct AcronymsController: RouteCollection {
         // 5. Register searchHandler(:_) to process GET requests to /api/acronyms/search.
         acronymsRoutes.get("search", use: searchHandler)
         
-        // 6. “Register getFirstHandler(:_) to process GET requests to /api/acronyms/first.
+        // 6. Register getFirstHandler(:_) to process GET requests to /api/acronyms/first.
         acronymsRoutes.get("first", use: getFirstHandler)
         
         // 7. Register sortedHandler(:_) to process GET requests to /api/acronyms/sorted.
@@ -36,6 +36,15 @@ struct AcronymsController: RouteCollection {
         
         // 8. GET request to /api/acronyms/<ACRONYM ID>/user to getUserHandler(_:).
         acronymsRoutes.get(Acronym.parameter, "user", use: getUserHandler)
+        
+        // 9. HTTP POST request to /api/acronyms/<ACRONYM_ID>/categories/<CATEGORY_ID> to addCategoriesHandler(_:)
+        acronymsRoutes.post(Acronym.parameter, "categories", Category.parameter, use: addCategoriesHandler)
+        
+        // 10. HTTP GET request to /api/acronyms/<ACRONYM_ID>/categories to getCategoriesHandler(:_).
+        acronymsRoutes.get(Acronym.parameter, "categories", use: getCategoriesHandler)
+        
+        // 11. HTTP DELETE request to /api/acronyms/<ACRONYM_ID>/categories/<CATEGORY_ID> to removeCategoriesHandler(_:).
+        acronymsRoutes.delete(Acronym.parameter, "categories", Category.parameter, use: removeCategoriesHandler)
     }
     
     // MARK: - Retrieve all records
@@ -141,6 +150,43 @@ struct AcronymsController: RouteCollection {
             
             // 3. Use the new computed property created above to get the acronym’s owner.
             acronym.user.get(on: req)
+        })
+    }
+    
+    // MARK: - Creating Acronym's Sibling
+    // 1. Define a new route handler, addCategoriesHandler(_:), that returns a Future<HTTPStatus>.
+    func addCategoriesHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        
+        // 2. Use flatMap(to:_:_:) to extract both the acronym and category from the request’s parameters.
+        return try flatMap(to: HTTPStatus.self, req.parameters.next(Acronym.self), req.parameters.next(Category.self), { (acronym, category) in
+            
+            // 3. Use attach(_:on:) to set up the relationship between acronym and category. This creates a pivot model and saves it in the database. Transform the result into a 201 Created response.
+            // Attaches the model to this relationship.
+            return acronym.categories.attach(category, on: req).transform(to: .created)
+        })
+    }
+    
+    // MARK: - Getting Acronym's siblings
+    // 1. Defines route handler getCategoriesHandler(_:) returning Future<[Category]>.
+    func getCategoriesHandler(_ req: Request) throws -> Future<[Category]> {
+        
+        // 2. Extract the acronym from the request’s parameters and unwrap the returned future.
+        return try req.parameters.next(Acronym.self).flatMap(to: [Category].self, { (acronym) in
+            
+            // 3. Use the new computed property to get the categories. Then use a Fluent query to return all the categories.
+            try acronym.categories.query(on: req).all()
+        })
+    }
+    
+    // MARK: - Removing sibling relationship
+    // 1. Define a new route handler, removeCategoriesHandler(_:), that returns a Future<HTTPStatus>.
+    func removeCategoriesHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        
+        // 2. Use flatMap(to:_:_:) to extract both the acronym and category from the request’s parameters
+        return try flatMap(to: HTTPStatus.self, req.parameters.next(Acronym.self), req.parameters.next(Category.self), { (acronym, category) in
+            
+            // 3. Use detach(_:on:) to remove the relationship between acronym and category. This finds the pivot model in the database and deletes it. Transform the result into a 204 No Content response.
+            return acronym.categories.detach(category, on: req).transform(to: .noContent)
         })
     }
 }

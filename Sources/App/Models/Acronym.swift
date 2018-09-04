@@ -43,6 +43,13 @@ extension Acronym {
         // 2. Use Fluent’s parent(_:) function to retrieve the parent. This takes the key path of the user reference on the acronym.
         return parent(\.userID)
     }
+    
+    // 1. Add a computed property to Acronym to get an acronym’s categories. This returns Fluent’s generic Sibling type. It returns the siblings of an Acronym that are of type Category and held using the AcronymCategoryPivot.
+    var categories: Siblings<Acronym, Category, AcronymCategoryPivot> {
+        
+        // 2. Use Fluent’s siblings() function to retrieve all the categories. Fluent handles everything else.
+        return siblings()
+    }
 }
 
 // MARK: - Conform Acronym to Migration for saving data to db
