@@ -32,7 +32,7 @@ struct AcronymsController: RouteCollection {
         acronymsRoutes.get("first", use: getFirstHandler)
         
         // 7. Register sortedHandler(:_) to process GET requests to /api/acronyms/sorted.
-        acronymsRoutes.get("sort", use: sortHandler)
+        acronymsRoutes.get("sorted", use: sortedHandler)
         
         // 8. GET request to /api/acronyms/<ACRONYM ID>/user to getUserHandler(_:).
         acronymsRoutes.get(Acronym.parameter, "user", use: getUserHandler)
@@ -136,7 +136,7 @@ struct AcronymsController: RouteCollection {
     }
     
     // MARK: - Sorted records
-    func sortHandler(_ req: Request) throws -> Future<[Acronym]> {
+    func sortedHandler(_ req: Request) throws -> Future<[Acronym]> {
         // 1. Create a query for Acronym and use sort(_:_:) to perform the sort. This function takes the field to sort on and the direction to sort in. Finally use all() to return all the results of the query.
         return Acronym.query(on: req).sort(\.short, .ascending).all()
     }

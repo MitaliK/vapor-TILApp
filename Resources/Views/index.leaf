@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+#// 1
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+#// 2
+<title>#(title2) | Acronyms</title>
+</head>
+<body>
+#// 3
+<h1>Acronyms</h1>
+#// 4
+#if(acronyms) {
+#// 5
+<table>
+    <thead>
+        <tr>
+            <th>Short</th>
+            <th>Long</th>
+        </tr>
+    </thead>
+    <tbody>
+        #for(acronym in acronyms) {
+        <tr>
+            <td><a href="/acronyms/#(acronym.id)">#(acronym.short)</a></td>
+            <td>#(acronym.long)</td>
+        </tr>
+        }
+    </tbody>
+</table>
+} else {
+<h2>There aren't any acronyms yet!</h2>
+}
+</body>
+</html>

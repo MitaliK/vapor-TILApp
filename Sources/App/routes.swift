@@ -23,4 +23,9 @@ public func routes(_ router: Router) throws {
     let categoriesController = CategoriesController()
     // 2. Register the new type with router to ensure the controller routes get registers
     try router.register(collection: categoriesController)
+    
+    // 1. Creates a new WebsiteController
+    let websiteController = WebsiteController()
+    // 2. Register the new type with router to ensure the controller routes get registers
+    try router.register(collection: websiteController)
 }
